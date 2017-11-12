@@ -1,16 +1,3 @@
-import csv
-def importcols(file):
-    return list(csv.reader(open(file)))[0]
-def importdata(file):
-    l = list(csv.reader(open(file)))
-    del l[0]
-    return l
-
-cols = importcols('train.csv')
-data = importdata('train.csv')
-
-#['PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp', 'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked']
-
 # Without looking at the data:
 # 'PassengerId', 'Survived', and 'Name' columns are used for identification, not training.
 # 'Pclass' and 'Fare' columns ('Cabin', 'Ticket') are likely to be highly correlated. Since we are using a decision tree as our first model, we will represent all of these using Pclass.
@@ -21,65 +8,22 @@ data = importdata('train.csv')
 # Useful: ['Pclass', 'Sex', 'Age', 'SibSp', 'Parch']
 # Not Useful: ['PassengerId', 'Survived', 'Name', 'Ticket', 'Fare', 'Cabin', 'Embarked']
 
+import csv
+from sklearn import tree
 
+def importcols(file):
+    return list(csv.reader(open(file)))[0]
+def importdata(file):
+    l = list(csv.reader(open(file)))
+    del l[0]
+    return l
 
-# Now let's look at the data.
+def train(input, output):
+    
+def predict(input):
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-#N = 3
-#survived = [0, 0, 0]
-#died = [0, 0, 0]
-#
-#for person in data:
-#    if person[1] == "1":
-#        survived[int(person[2])-1] += 1
-#    elif person[1] == "0":
-#        died[int(person[2])-1] += 1
-#
-#ind = np.arange(N)
-#width = 0.35
-#
-#p1 = plt.bar(ind, survived, width)
-#p2 = plt.bar(ind, died, width, bottom=survived)
-#
-#plt.title('Survival by Class')
-#plt.ylabel('People')
-#plt.xticks(ind, ('Class 1', 'Class 2', 'Class 3'))
-#plt.yticks(np.arange(0, 501, 100))
-#plt.legend((p1[0], p2[0]), ('Alive', 'Dead'))
-#
-#plt.show()
-
-#N = 3
-#survived = [0, 0]
-#died = [0, 0]
-#
-#for person in data:
-#    if person[1] == '1':
-#        if person[4] == 'male':
-#            survived[0] += 1
-#        elif person[4] == 'female':
-#            survived[1] += 1
-#    elif person[1] == '0':
-#        if person[4] == 'male':
-#            died[0] += 1
-#        elif person[4] == 'female':
-#            died[1] += 1
-#            
-#print(survived, died)
-#
-#ind = np.arange(N)
-#width = 0.35
-#p1 = plt.bar(ind, survived, width)
-#p2 = plt.bar(ind, died, width, bottom=survived)
-#plt.title("Survival by Sex")
-#plt.ylabel('People')
-#plt.xticks(ind, ('Male', 'Female'))
-#plt.yticks(np.arange(0, 501, 100))
-#plt.legend((p1[0], p2[0]), ('Alive', 'Dead'))
-#plt.show()
+cols = importcols('train.csv')
+data = importdata('train.csv')
 
 cols = ['Pclass', 'Sex', 'Age', 'SibSp', 'Parch']
 rawcols = ['PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp', 'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked']
@@ -100,8 +44,6 @@ for person in data:
             output.append(0)
     X.append(output)
     Y.append(person[1])
-    
-from sklearn import tree
 
 clf = tree.DecisionTreeClassifier()
 clf = clf.fit(X, Y)
