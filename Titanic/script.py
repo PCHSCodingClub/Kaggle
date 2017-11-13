@@ -10,11 +10,12 @@ Not Useful: ['PassengerId', 'Survived', 'Name', 'Ticket', 'Fare', 'Cabin', 'Emba
 
 
 
-import csv
+import csv, copy, os, pydot
 from sklearn import tree
+from sklearn.externals.six import StringIO
 
-def formatdata(data):
-    outdata = data
+def formatdata(indata):
+    outdata = copy.deepcopy(indata)
     rawcols = outdata[0]
     del outdata[0]
     for item in outdata:
@@ -29,8 +30,8 @@ def formatdata(data):
                 outdata[outdata.index(item)][item.index(col)] = '0'
     return outdata
 
-def getcols(data, rawcols, cols):
-    outdata = data
+def getcols(indata, rawcols, cols):
+    outdata = copy.deepcopy(indata)
     colindex = []
     for col in cols:
         colindex.append(rawcols.index(col))
@@ -43,41 +44,52 @@ def getcols(data, rawcols, cols):
     return outdata
 
 def train(file, inCols, outCols):
+    print("\nTraining the model...")
     rawfile = list(csv.reader(open(file)))
     rawcols = rawfile[0]
     data = formatdata(rawfile)
-#    X = getcols(data, rawcols, inCols)
-    X = getcols(data, rawcols, ['Pclass', 'Sex', 'Age', 'SibSp', 'Parch'])
-    print(X)
-    Y = getcols(data, rawcols, outCols)
+    trainInput = getcols(data, rawcols, inCols)
+    trainOutput = getcols(data, rawcols, outCols)
     clf = tree.DecisionTreeClassifier()
-    return clf.fit(X, Y)
+    clf = clf.fit(trainInput, trainOutput)
+    print('Done')
+    return clf
 
 def predict(infile, inCols, outfile, model, format):
+    print("\nGenerating predictions...")
     rawfile = list(csv.reader(open(infile)))
     rawcols = rawfile[0]
     data = formatdata(rawfile)
-#    X = getcols(data, rawcols, inCols)
-    X = getcols(data, rawcols, ['Pclass', 'Sex', 'Age', 'SibSp', 'Parch'])
-    prediction = model.predict(X)
-    print(prediction)
-#    with open(outfile, 'w') as file:
-#        header = ''
-#        for item in format:
-#            header += item + ','
-#        header = header[:-1]
-#        header += '\n'
-#        file.write(header)
-#        for item in range(len(prediction)):
-#            output = ''
-#            for col in item:
-#                output += 
-#            file.write(test[item][0] + ',' + prediction[item] + '\n')
+    predictInput = getcols(data, rawcols, inCols)
+    prediction = model.predict(predictInput)
+    with open(outfile, 'w') as file:
+        header = ''
+        rawcoli = []
+        for item in format:
+            header += item + ','
+        header = header[:-1]
+        header += '\n'
+        file.write(header)
+        rawcoli = []
+        cols = []
+        for i in range(len(format)-1):
+            cols.append(format[i])
+        attributes = getcols(data, rawcols, cols)
+        output = ''
+        for i in range(len(prediction)):
+            for att in attributes[i]:
+                output += att + ','
+            output += prediction[i] + '\n'
+        file.write(output)
+    print('Done')
+    dir_path = os.path.dirname(os.path.realpath(__file__)) + outfile
+    print("\nPrediction Successful\nExported to '" + dir_path + "'\n")
+    
+def main(inCols, outCols, trainfile, testfile, exportfile, exportformat):
+    clf = train(trainfile, inCols, outCols)
+    predict(testfile, inCols, exportfile, clf, exportformat)
+    
+main(['Pclass', 'Sex', 'Age', 'SibSp', 'Parch'], ['Survived'], 'train.csv', 'test.csv', 'prediction.csv', ['PassengerId', 'Survived'])
 
-inCols = ['Pclass', 'Sex', 'Age', 'SibSp', 'Parch']
-outCols = ['Survived']
-
-clf = train('train.csv', inCols, outCols)
-predict('test.csv', inCols, 'prediction.csv', clf, ['PassengerId', 'Survived'])
-
-# Prediction Score: 0.70813
+# Submission Scores (Goal: 97+)
+scores = {1: 0.70813, 2: 0.72248}
