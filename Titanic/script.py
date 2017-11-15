@@ -10,7 +10,7 @@ Not Useful: ['PassengerId', 'Survived', 'Name', 'Ticket', 'Fare', 'Cabin', 'Emba
 
 
 
-import csv, copy, os, pydot
+import csv, copy, os
 from sklearn import tree
 from sklearn.externals.six import StringIO
 
