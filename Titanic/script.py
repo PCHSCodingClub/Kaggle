@@ -4,7 +4,7 @@
 3. The 'Embarked' column is logically irrelevant to a passanger's survival.
 4. A higher number of parents should increase a child's rate of survival, but a higher number of children should decreate a parent's rate of survival. Because of this contradiction, these columns are unreliable for now (we will still use them and see what we get).
 
-Useful: ['Pclass', 'Sex', 'Age', 'Sibsp', 'Parch']
+Useful: ['Fare', 'Sex', 'Age', 'Sibsp', 'Parch']
 Not Useful: ['PassengerId', 'Survived', 'Name', 'Ticket', 'Fare', 'Cabin', 'Embarked']
 '''
 
@@ -12,7 +12,6 @@ Not Useful: ['PassengerId', 'Survived', 'Name', 'Ticket', 'Fare', 'Cabin', 'Emba
 
 import csv, copy, os
 from sklearn import tree
-from sklearn.externals.six import StringIO
 
 def formatdata(indata):
     outdata = copy.deepcopy(indata)
@@ -27,7 +26,7 @@ def formatdata(indata):
         item[rawcols.index('Sex')] = sex
         for col in item:
             if col == '':
-                outdata[outdata.index(item)][item.index(col)] = '0'
+                outdata[outdata.index(item)][item.index(col)] = '24' #24
     return outdata
 
 def getcols(indata, rawcols, cols):
@@ -84,12 +83,24 @@ def predict(infile, inCols, outfile, model, format):
     print('Done')
     dir_path = os.path.dirname(os.path.realpath(__file__)) + outfile
     print("\nPrediction Successful\nExported to '" + dir_path + "'\n")
+	
+def calcAvg(file, col):
+	rawfile = list(csv.reader(open(file)))
+	rawcols = rawfile[0]
+	data = formatdata(rawfile)
+	avgcols = getcols(data, rawcols, [col])
+	numList = []
+	sum = 0
+	for i in avgcols:
+		numList.append(float(i[0]))
+		sum += float(i[0])
+	print(sum/len(numList))
     
 def main(inCols, outCols, trainfile, testfile, exportfile, exportformat):
     clf = train(trainfile, inCols, outCols)
     predict(testfile, inCols, exportfile, clf, exportformat)
     
-main(['Pclass', 'Sex', 'Age', 'SibSp', 'Parch'], ['Survived'], 'train.csv', 'test.csv', 'prediction.csv', ['PassengerId', 'Survived'])
+main(['Pclass', 'Sex', 'Sex', 'Age', 'Age', 'SibSp', 'Parch'], ['Survived'], 'train.csv', 'test.csv', 'prediction.csv', ['PassengerId', 'Survived'])
 
 # Submission Scores (Goal: 97+)
 scores = {1: 0.70813, 2: 0.72248}
