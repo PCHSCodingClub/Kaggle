@@ -20,12 +20,11 @@ def filter(data, cols, col, keyword):
 		colData.append(list[colIndex])
 	matchIndex = []
 	for i in range(len(colData)):
-#		if keyword == colData[i]:
-#		if keyword in colData[i]:
 		if colData[i] == '':
 			continue
-		if float(keyword) >= float(colData[i]) and float(keyword)-10 < float(colData[i]):
-			print(colData[i])
+		if keyword == colData[i]:##Equals
+#		if keyword in colData[i]:##Contains
+#		if float(keyword) >= float(colData[i]) and float(keyword)-10 < float(colData[i]):
 			matchIndex.append(i)
 	outData = []
 	for index in matchIndex:
